@@ -25,10 +25,9 @@ bool	all_threads_running(t_mutex *mutex, long *thread_count,
 	return (ret);
 }
 
-void	error_exit(const char *error)
+void	print_error(const char *error)
 {
 	printf("%s\n", error);
-	exit(EXIT_FAILURE);
 }
 
 void	increment_long(t_mutex *mutex, long *value)

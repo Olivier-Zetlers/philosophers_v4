@@ -50,15 +50,18 @@ int	main(int ac, char **av)
 
 	if (ac == 5 || ac == 6)
 	{
-		parse_input(&table, av);
-		table_init(&table);
+		if (!parse_input(&table, av))
+			return (1);
+		if (!table_init(&table))
+			return (1);
 		dinner_start(&table);
 		table_cleanup(&table);
 	}
 	else
 	{
-		error_exit("usage: ./philo num_philos time_to_die time_to_eat "
+		print_error("usage: ./philo num_philos time_to_die time_to_eat "
 			"time_to_sleep [meals]");
+		return (1);
 	}
 	return (0);
 }

@@ -17,16 +17,18 @@ long	get_time(t_timecode timecode)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL))
-		error_exit("error: gettimeofday failed");
+	{
+		print_error("error: gettimeofday failed");
+		return (-1);
+	}
 	if (timecode == SECOND)
 		return (tv.tv_sec + (tv.tv_usec / 1e6));
 	else if (timecode == MILLISECOND)
 		return (tv.tv_sec * 1e3 + (tv.tv_usec / 1e3));
 	else if (timecode == MICROSECOND)
 		return (tv.tv_sec * 1e6 + tv.tv_usec);
-	else
-		error_exit("error: invalid time code");
-	return (1337);
+	print_error("error: invalid time code");
+	return (-1);
 }
 
 void	precise_usleep(long usec, t_table *table)
@@ -52,6 +54,27 @@ void	precise_usleep(long usec, t_table *table)
 	}
 }
 
+static void	put_number(long n)
+{
+	char	c;
+
+	if (n >= 10)
+		put_number(n / 10);
+	c = '0' + (n % 10);
+	write(1, &c, 1);
+}
+
+static void	print_philo_msg(long elapsed, int id, const char *msg)
+{
+	put_number(elapsed);
+	write(1, " ", 1);
+	put_number(id);
+	write(1, " ", 1);
+	while (*msg)
+		write(1, msg++, 1);
+	write(1, "\n", 1);
+}
+
 void	print_status(t_philo_status status, t_philo *philo)
 {
 	long	elapsed;
@@ -62,14 +85,14 @@ void	print_status(t_philo_status status, t_philo *philo)
 	elapsed = get_time(MILLISECOND) - philo->table->start_simulation;
 	if ((status == GRAB_LEFT_FORK || status == GRAB_RIGHT_FORK)
 		&& !simulation_finished(philo->table))
-		printf("%ld %d has taken a fork\n", elapsed, philo->id + 1);
-	if ((status == EATING) && !simulation_finished(philo->table))
-		printf("%ld %d is eating\n", elapsed, philo->id + 1);
-	if ((status == SLEEPING) && !simulation_finished(philo->table))
-		printf("%ld %d is sleeping\n", elapsed, philo->id + 1);
-	if ((status == THINKING) && !simulation_finished(philo->table))
-		printf("%ld %d is thinking\n", elapsed, philo->id + 1);
-	if ((status == DIED) && !simulation_finished(philo->table))
-		printf("%ld %d died\n", elapsed, philo->id + 1);
+		print_philo_msg(elapsed, philo->id + 1, "has taken a fork");
+	else if ((status == EATING) && !simulation_finished(philo->table))
+		print_philo_msg(elapsed, philo->id + 1, "is eating");
+	else if ((status == SLEEPING) && !simulation_finished(philo->table))
+		print_philo_msg(elapsed, philo->id + 1, "is sleeping");
+	else if ((status == THINKING) && !simulation_finished(philo->table))
+		print_philo_msg(elapsed, philo->id + 1, "is thinking");
+	else if ((status == DIED) && !simulation_finished(philo->table))
+		print_philo_msg(elapsed, philo->id + 1, "died");
 	mutex_op(&philo->table->write_mutex, MTX_UNLOCK);
 }

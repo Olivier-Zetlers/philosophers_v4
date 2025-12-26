@@ -84,7 +84,7 @@ void	table_cleanup(t_table *table)
 	free(table->philos);
 }
 
-void	table_init(t_table *table)
+bool	table_init(t_table *table)
 {
 	int	i;
 
@@ -93,14 +93,21 @@ void	table_init(t_table *table)
 	table->all_threads_ready = false;
 	table->running_thread_count = 0;
 	table->philos = safe_malloc(table->philosopher_count * sizeof(t_philo));
+	if (!table->philos)
+		return (false);
 	table->forks = safe_malloc(table->philosopher_count * sizeof(t_fork));
-	mutex_op(&table->table_mutex, MTX_INIT);
-	mutex_op(&table->write_mutex, MTX_INIT);
+	if (!table->forks)
+		return (free(table->philos), false);
+	if (!mutex_op(&table->table_mutex, MTX_INIT)
+		|| !mutex_op(&table->write_mutex, MTX_INIT))
+		return (free(table->philos), free(table->forks), false);
 	while (i < table->philosopher_count)
 	{
-		mutex_op(&table->forks[i].mutex, MTX_INIT);
+		if (!mutex_op(&table->forks[i].mutex, MTX_INIT))
+			return (free(table->philos), free(table->forks), false);
 		table->forks[i].fork_id = i;
 		i++;
 	}
 	philo_init(table);
+	return (true);
 }

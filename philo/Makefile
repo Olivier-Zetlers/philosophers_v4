@@ -1,39 +1,48 @@
-NAME = philo
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::   #
+#    Makefile                                           :+:      :+:    :+:   #
+#                                                     +:+ +:+         +:+     #
+#    By: ozetlers <marvin@42.fr>                    +#+  +:+       +#+        #
+#                                                 +#+#+#+#+#+   +#+           #
+#    Created: 2025/12/26 03:40:00 by ozetlers          #+#    #+#             #
+#    Updated: 2025/12/26 03:40:00 by ozetlers         ###   ########.fr       #
+#                                                                              #
+# **************************************************************************** #
 
-CC = cc
-CFLAGS = -Wall -Wextra -Werror
-INCLUDES = -I includes
+NAME		= philo
 
-SRC_DIR = srcs
-OBJ_DIR = obj
+CC			= cc
+CFLAGS		= -Wall -Wextra -Werror -pthread
+INCLUDES	= -I./includes
 
-SRC =	main.c \
-		dinner.c \
-		monitor.c \
-		init.c \
-		parsing.c \
-		time.c \
-		sync.c \
-		safe_wrappers.c \
-		sync_access.c
+SRCS_DIR	= srcs
+SRCS		= $(SRCS_DIR)/main.c \
+			  $(SRCS_DIR)/dinner.c \
+			  $(SRCS_DIR)/init.c \
+			  $(SRCS_DIR)/monitor.c \
+			  $(SRCS_DIR)/parsing.c \
+			  $(SRCS_DIR)/safe_wrappers.c \
+			  $(SRCS_DIR)/sync.c \
+			  $(SRCS_DIR)/sync_access.c \
+			  $(SRCS_DIR)/time.c
 
-OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
+OBJS		= $(SRCS:.c=.o)
 
-all: $(NAME)
+all:		$(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -pthread $(OBJ) -o $(NAME)
+$(NAME):	$(OBJS)
+			$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c includes/philo.h
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+%.o:		%.c
+			$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR)
+			rm -f $(OBJS)
 
-fclean: clean
-	rm -f $(NAME)
+fclean:		clean
+			rm -f $(NAME)
 
-re: fclean all
+re:			fclean all
 
-.PHONY: all clean fclean re
+.PHONY:		all clean fclean re
