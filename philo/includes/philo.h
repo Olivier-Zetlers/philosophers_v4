@@ -135,6 +135,7 @@ bool	thread_op(pthread_t *thread, void *(*start_routine)(void *),
 /* sync_access.c */
 bool	get_bool(t_mutex *mutex, bool *value);
 long	get_long(t_mutex *mutex, long *value);
+bool	is_space(char c);
 void	set_bool(t_mutex *mutex, bool *dest, bool value);
 void	set_long(t_mutex *mutex, long *dest, long value);
 

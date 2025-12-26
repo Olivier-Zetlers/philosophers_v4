@@ -32,6 +32,11 @@ long	get_long(t_mutex *mutex, long *value)
 	return (ret);
 }
 
+bool	is_space(char c)
+{
+	return ((c >= 9 && c <= 13) || c == 32);
+}
+
 void	set_bool(t_mutex *mutex, bool *dest, bool value)
 {
 	mutex_op(mutex, MTX_LOCK);

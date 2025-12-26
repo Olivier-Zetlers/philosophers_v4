@@ -13,6 +13,7 @@
 #include "philo.h"
 
 static bool			is_digit(char c);
+static const char	*skip_whitespace_and_sign(const char *str, bool *error);
 static const char	*validate_input(const char *str, bool *error);
 
 static long	ft_atoi(const char *str, bool *error)
@@ -44,9 +45,18 @@ static bool	is_digit(char c)
 	return (c >= '0' && c <= '9');
 }
 
-static bool	is_space(char c)
+static const char	*skip_whitespace_and_sign(const char *str, bool *error)
 {
-	return ((c >= 9 && c <= 13) || c == 32);
+	while (is_space(*str))
+		str++;
+	if (*str == '+')
+		str++;
+	else if (*str == '-')
+	{
+		print_error("error: negative values not allowed");
+		*error = true;
+	}
+	return (str);
 }
 
 bool	parse_input(t_table *table, char **av)
@@ -81,15 +91,9 @@ static const char	*validate_input(const char *str, bool *error)
 	size_t		len;
 
 	len = 0;
-	while (is_space(*str))
-		str++;
-	if (*str == '+')
-		str++;
-	else if (*str == '-')
-	{
-		print_error("error: negative values not allowed");
-		return (*error = true, str);
-	}
+	str = skip_whitespace_and_sign(str, error);
+	if (*error)
+		return (str);
 	if (!is_digit(*str))
 		return (print_error("error: invalid character, expected digit"),
 			*error = true, str);
